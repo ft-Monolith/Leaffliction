@@ -16,13 +16,17 @@ import sys
 
 import matplotlib.pyplot as plt
 
-from src.utils import list_images
+from src.utils import error_exit, list_images
 
 
 def count_images_per_class(directory):
     """Return a dict {class_name: image_count} for each subdirectory."""
     counts = {}
-    for name in sorted(os.listdir(directory)):
+    try:
+        names = sorted(os.listdir(directory))
+    except OSError as error:
+        error_exit(f"cannot read '{directory}': {error}")
+    for name in names:
         path = os.path.join(directory, name)
         if os.path.isdir(path):
             counts[name] = len(list_images(path))
@@ -55,14 +59,14 @@ def main():
 
     directory = sys.argv[1]
     if not os.path.isdir(directory):
-        print(f"Error: '{directory}' is not a directory", file=sys.stderr)
-        sys.exit(1)
+        error_exit(f"'{directory}' is not a directory")
 
     counts = count_images_per_class(directory)
     if not counts:
-        print(f"Error: no class subdirectories in '{directory}'",
-              file=sys.stderr)
-        sys.exit(1)
+        error_exit(f"no class subdirectories in '{directory}'")
+
+    if sum(counts.values()) == 0:
+        error_exit(f"no images found in '{directory}'")
 
     title = os.path.basename(os.path.normpath(directory))
     plot_distribution(title, counts)
