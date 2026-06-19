@@ -1,5 +1,7 @@
 /images/
 /leaves.zip
 /CLAUDE.md
+/__pycache__/
 __pycache__/
 *.pyc
+/.venv/
