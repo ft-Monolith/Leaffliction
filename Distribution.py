@@ -42,7 +42,6 @@ def plot_distribution(title, counts):
     fig.suptitle(f"{title} class distribution")
 
     ax_pie.pie(values, labels=labels, autopct="%1.1f%%")
-    ax_pie.axis("equal")
 
     ax_bar.bar(labels, values)
     ax_bar.set_ylabel("Number of images")
