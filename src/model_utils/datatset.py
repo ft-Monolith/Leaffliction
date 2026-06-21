@@ -10,7 +10,7 @@ IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
 IMG_SIZE = 128
 BATCH_SIZE = 32
 
-# Prétraitement minimal : redimensionner + convertir en tenseur.
+# aalignement + tenseur 
 TRANSFORM = transforms.Compose([
     transforms.Resize((IMG_SIZE, IMG_SIZE)),
     transforms.ToTensor(),
