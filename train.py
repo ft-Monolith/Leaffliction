@@ -2,9 +2,8 @@
 
 import os
 import sys
-from PIL import Image
-from dataset import get_n_split
-from CNN import Make_CNN
+from src.model_utils.datatset import get_n_split
+from src.model_utils.CNN import make_CNN
 
 def main():
     if len(sys.argv) != 2:
@@ -16,9 +15,11 @@ def main():
         print(f"'{directory}' is not a directory", file=sys.stderr)
         sys.exit(1)
 
-    dataset = get_n_split(directory)
+    train_loader, val_loader, classes = get_n_split(directory)
+    print(f"Found {len(classes)} classes: {classes}")
+    print(f"Training samples: {len(train_loader.dataset)}, Validation samples: {len(val_loader.dataset)}")
     
-    CNN = Make_CNN()
+    CNN = make_CNN()
 
 if __name__ == "__main__":
     main()
