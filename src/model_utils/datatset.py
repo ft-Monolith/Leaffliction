@@ -10,7 +10,6 @@ IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
 IMG_SIZE = 128
 BATCH_SIZE = 32
 
-# aalignement + tenseur 
 TRANSFORM = transforms.Compose([
     transforms.Resize((IMG_SIZE, IMG_SIZE)),
     transforms.ToTensor(),
@@ -48,11 +47,6 @@ def _list_samples(directory):
 
 
 def get_n_split(directory, val_ratio=0.2, min_val=100, seed=42):
-    """Charge les images et renvoie (train_loader, val_loader, classes).
-
-    La validation contient au moins ``min_val`` images et n'est jamais
-    vue pendant l'entraînement.
-    """
     classes, samples = _list_samples(directory)
     if not samples:
         raise ValueError(f"no image found in '{directory}'")
