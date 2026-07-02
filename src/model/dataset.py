@@ -17,7 +17,6 @@ TRANSFORM = transforms.Compose([
 
 
 class LeafDataset(Dataset):
-    """Dataset (chemin, label) qui ouvre l'image et applique un transform."""
 
     def __init__(self, samples, transform):
         self.samples = samples
@@ -33,7 +32,6 @@ class LeafDataset(Dataset):
 
 
 def _list_samples(directory):
-    """Retourne (classes, samples) avec samples = liste (chemin, index)."""
     classes = sorted(
         entry.name for entry in os.scandir(directory) if entry.is_dir()
     )
