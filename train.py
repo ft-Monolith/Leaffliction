@@ -1,17 +1,21 @@
 
 
+import hashlib
 import os
 import sys
+import zipfile
 
 import torch
 import torch.nn as nn
 
-from src.model_utils.datatset import get_n_split
-from src.model_utils.CNN import make_CNN
+from src.model.dataset import get_n_split
+from src.model.cnn import make_CNN
 
 LEARNING_RATE = 0.001
 EPOCHS = 50
 PATIENCE = 3  # nb d'epochs sans amelioration avant d'arreter
+ZIP_PATH = "leaffliction.zip"
+SIGNATURE_PATH = "signature.txt"
 
 
 def evaluate(model, val_loader, criterion, device):
@@ -58,6 +62,28 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device):
     epoch_loss = running_loss / len(train_loader.dataset)
     epoch_acc = correct / total
     return epoch_loss, epoch_acc
+
+
+def make_zip(model_path, data_dir, zip_path):
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.write(model_path, os.path.basename(model_path))
+        for root, _, files in os.walk(data_dir):
+            for name in files:
+                full = os.path.join(root, name)
+                archive.write(full, full)
+    print(f"Zip cree : {zip_path}")
+
+
+def write_signature(zip_path, signature_path):
+    sha1 = hashlib.sha1()
+    with open(zip_path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(8192), b""):
+            sha1.update(chunk)
+    digest = sha1.hexdigest()
+    with open(signature_path, "w") as handle:
+        handle.write(digest + "\n")
+    print(f"Signature sha1 : {digest}")
+    return digest
 
 
 def main():
@@ -114,6 +140,9 @@ def main():
 
     print(f"best val accuracy: {best_val_acc:.4f}")
     print(f"Model saved in {model_path}")
+
+    make_zip(model_path, directory, ZIP_PATH)
+    write_signature(ZIP_PATH, SIGNATURE_PATH)
 
 
 if __name__ == "__main__":
