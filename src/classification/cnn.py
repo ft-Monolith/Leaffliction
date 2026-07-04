@@ -1,8 +1,31 @@
+import os
+
+import torch
 import torch.nn as nn
+
+from src.utils import error_exit
 
 
 def make_CNN(num_classes):
     model = LeafCNN(num_classes)
+    return model
+
+
+def get_device():
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def load_model(model_path, num_classes, device="cpu"):
+    if not os.path.isfile(model_path):
+        error_exit(f"model '{model_path}' missing")
+    model = make_CNN(num_classes).to(device)
+    try:
+        state = torch.load(model_path, map_location=device)
+        model.load_state_dict(state)
+    except Exception:
+        error_exit(f"'{model_path}' is not a valid model "
+                   f"for {num_classes} classes")
+    model.eval()
     return model
 
 

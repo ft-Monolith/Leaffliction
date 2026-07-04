@@ -7,31 +7,10 @@ import torch
 from PIL import Image
 
 from src.classification.dataset import TRANSFORM
-from src.classification.cnn import make_CNN
-from src.utils import error_exit
+from src.classification.cnn import load_model
+from src.utils import error_exit, list_classes, IMAGE_EXTENSIONS
 
 DATA_DIR = "images"
-IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
-
-
-def get_classes(directory):
-    return sorted(
-        entry.name for entry in os.scandir(directory) if entry.is_dir()
-    )
-
-
-def load_model(model_path, num_classes):
-    if not os.path.isfile(model_path):
-        error_exit(f"model '{model_path}' missing")
-    model = make_CNN(num_classes)
-    try:
-        state = torch.load(model_path, map_location="cpu")
-        model.load_state_dict(state)
-    except Exception:
-        error_exit(f"'{model_path}' is not a valid model "
-                   f"for {num_classes} classes")
-    model.eval()
-    return model
 
 
 def predict(model, classes, image):
@@ -63,11 +42,7 @@ def run(image_path, model_path):
             not image_path.lower().endswith(IMAGE_EXTENSIONS):
         error_exit(f"'{image_path}' is not a valid image file")
 
-    if not os.path.isdir(DATA_DIR):
-        error_exit(f"dataset directory '{DATA_DIR}' not found "
-                   f"(needed for class names)")
-
-    classes = get_classes(DATA_DIR)
+    classes = list_classes(DATA_DIR)
     if not classes:
         error_exit(f"no class subdirectory in '{DATA_DIR}'")
 

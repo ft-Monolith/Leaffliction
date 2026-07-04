@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 
 from src.classification.dataset import get_n_split
-from src.classification.cnn import make_CNN
+from src.classification.cnn import make_CNN, get_device
 
 LEARNING_RATE = 0.001
 EPOCHS = 50
@@ -92,7 +92,7 @@ def run(directory):
     print(f"Train: {len(train_loader.dataset)} | "
           f"Val: {len(val_loader.dataset)}")
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = get_device()
     model = make_CNN(len(classes)).to(device)
     criterion = nn.CrossEntropyLoss()  # calcul de la loss
     # Adam : met à jour les poids du modèle

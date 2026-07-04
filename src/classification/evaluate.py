@@ -6,7 +6,7 @@ import zipfile
 import torch
 
 from src.classification.dataset import get_n_split
-from src.classification.cnn import make_CNN
+from src.classification.cnn import get_device, load_model
 from src.utils import error_exit
 
 EXTRACT_DIR = "unzipped"
@@ -47,13 +47,8 @@ def run(zip_path):
 
     _, val_loader, classes = get_n_split(images_dir)
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = make_CNN(len(classes)).to(device)
-    try:
-        state = torch.load(model_path, map_location=device)
-        model.load_state_dict(state)
-    except Exception:
-        error_exit(f"'{model_path}' is not a valid model")
+    device = get_device()
+    model = load_model(model_path, len(classes), device)
 
     acc = compute_accuracy(model, val_loader, device)
     n = len(val_loader.dataset)

@@ -17,6 +17,15 @@ def is_image(filename):
     return filename.lower().endswith(IMAGE_EXTENSIONS)
 
 
+def list_classes(directory):
+    """Return the sorted class names (subdirectories) of a directory."""
+    if not os.path.isdir(directory):
+        error_exit(f"'{directory}' is not a directory")
+    return sorted(
+        entry.name for entry in os.scandir(directory) if entry.is_dir()
+    )
+
+
 def list_images(directory):
     """Return the list of image file paths directly inside a directory.
 
