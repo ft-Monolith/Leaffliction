@@ -24,7 +24,12 @@ def load_model(model_path, num_classes):
     if not os.path.isfile(model_path):
         error_exit(f"model '{model_path}' missing")
     model = make_CNN(num_classes)
-    model.load_state_dict(torch.load(model_path, map_location="cpu"))
+    try:
+        state = torch.load(model_path, map_location="cpu")
+        model.load_state_dict(state)
+    except Exception:
+        error_exit(f"'{model_path}' is not a valid model "
+                   f"for {num_classes} classes")
     model.eval()
     return model
 
@@ -58,10 +63,21 @@ def run(image_path, model_path):
             not image_path.lower().endswith(IMAGE_EXTENSIONS):
         error_exit(f"'{image_path}' is not a valid image file")
 
+    if not os.path.isdir(DATA_DIR):
+        error_exit(f"dataset directory '{DATA_DIR}' not found "
+                   f"(needed for class names)")
+
     classes = get_classes(DATA_DIR)
+    if not classes:
+        error_exit(f"no class subdirectory in '{DATA_DIR}'")
+
     model = load_model(model_path, len(classes))
 
-    original = Image.open(image_path).convert("RGB")
+    try:
+        original = Image.open(image_path).convert("RGB")
+    except Exception:
+        error_exit(f"cannot open image '{image_path}'")
+
     predicted, transformed = predict(model, classes, original)
 
     print(f"Class predicted : {predicted}")

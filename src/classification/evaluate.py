@@ -7,6 +7,7 @@ import torch
 
 from src.classification.dataset import get_n_split
 from src.classification.cnn import make_CNN
+from src.utils import error_exit
 
 EXTRACT_DIR = "unzipped"
 MODEL_NAME = "model.pth"
@@ -14,8 +15,11 @@ IMAGES_NAME = "images"
 
 
 def extract_zip(zip_path, extract_dir):
-    with zipfile.ZipFile(zip_path, "r") as archive:
-        archive.extractall(extract_dir)
+    try:
+        with zipfile.ZipFile(zip_path, "r") as archive:
+            archive.extractall(extract_dir)
+    except zipfile.BadZipFile:
+        error_exit(f"'{zip_path}' is not a valid zip file")
     print(f"Zip extracted to {extract_dir}/")
 
 
@@ -38,11 +42,18 @@ def run(zip_path):
     model_path = os.path.join(EXTRACT_DIR, MODEL_NAME)
     images_dir = os.path.join(EXTRACT_DIR, IMAGES_NAME)
 
+    if not os.path.isfile(model_path):
+        error_exit(f"'{MODEL_NAME}' not found in the zip")
+
     _, val_loader, classes = get_n_split(images_dir)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = make_CNN(len(classes)).to(device)
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    try:
+        state = torch.load(model_path, map_location=device)
+        model.load_state_dict(state)
+    except Exception:
+        error_exit(f"'{model_path}' is not a valid model")
 
     acc = compute_accuracy(model, val_loader, device)
     n = len(val_loader.dataset)
