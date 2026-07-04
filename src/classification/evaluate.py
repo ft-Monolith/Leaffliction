@@ -1,14 +1,13 @@
+"""Évaluation du modèle sur le set de validation (Partie 4)."""
+
 import os
-import sys
 import zipfile
 
 import torch
 
-from src.model.dataset import get_n_split
-from src.model.cnn import make_CNN
-from src.utils import error_exit
+from src.classification.dataset import get_n_split
+from src.classification.cnn import make_CNN
 
-DEFAULT_ZIP = "leaffliction.zip"
 EXTRACT_DIR = "unzipped"
 MODEL_NAME = "model.pth"
 IMAGES_NAME = "images"
@@ -34,11 +33,7 @@ def compute_accuracy(model, loader, device):
     return correct / total if total else 0.0
 
 
-def main():
-    zip_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_ZIP
-    if not os.path.isfile(zip_path):
-        error_exit(f"'{zip_path}' is not a valid file")
-
+def run(zip_path):
     extract_zip(zip_path, EXTRACT_DIR)
     model_path = os.path.join(EXTRACT_DIR, MODEL_NAME)
     images_dir = os.path.join(EXTRACT_DIR, IMAGES_NAME)
@@ -52,7 +47,3 @@ def main():
     acc = compute_accuracy(model, val_loader, device)
     n = len(val_loader.dataset)
     print(f"Validation : {n} images | accuracy : {acc * 100:.2f}%")
-
-
-if __name__ == "__main__":
-    main()

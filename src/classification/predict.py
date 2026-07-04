@@ -1,16 +1,16 @@
+"""Prédiction de la maladie d'une feuille + affichage (Partie 4)."""
+
 import os
-import sys
 
 import matplotlib.pyplot as plt
 import torch
 from PIL import Image
 
-from src.model.dataset import TRANSFORM
-from src.model.cnn import make_CNN
+from src.classification.dataset import TRANSFORM
+from src.classification.cnn import make_CNN
 from src.utils import error_exit
 
 DATA_DIR = "images"
-DEFAULT_MODEL = os.path.join("models", "model.pth")
 IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
 
 
@@ -53,13 +53,7 @@ def show(original, transformed, predicted):
     plt.show()
 
 
-def main():
-    if len(sys.argv) < 2:
-        error_exit("usage: ./predict.py <image> [model.pth]")
-
-    image_path = sys.argv[1]
-    model_path = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_MODEL
-
+def run(image_path, model_path):
     if not os.path.isfile(image_path) or \
             not image_path.lower().endswith(IMAGE_EXTENSIONS):
         error_exit(f"'{image_path}' is not a valid image file")
@@ -72,7 +66,3 @@ def main():
 
     print(f"Class predicted : {predicted}")
     show(original, transformed, predicted)
-
-
-if __name__ == "__main__":
-    main()

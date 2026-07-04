@@ -1,16 +1,14 @@
-
+"""Entraînement du CNN + création du zip et de la signature (Partie 4)."""
 
 import hashlib
 import os
-import sys
 import zipfile
 
 import torch
 import torch.nn as nn
 
-from src.model.dataset import get_n_split
-from src.model.cnn import make_CNN
-from src.utils import error_exit
+from src.classification.dataset import get_n_split
+from src.classification.cnn import make_CNN
 
 LEARNING_RATE = 0.001
 EPOCHS = 50
@@ -87,14 +85,7 @@ def write_signature(zip_path, signature_path):
     return digest
 
 
-def main():
-    if len(sys.argv) != 2:
-        error_exit("usage: ./train.py <directory>")
-
-    directory = sys.argv[1]
-    if not os.path.isdir(directory):
-        error_exit(f"'{directory}' is not a directory")
-
+def run(directory):
     # charge les images, les trie, les split, les met en tenseurs
     train_loader, val_loader, classes = get_n_split(directory)
     print(f"Found {len(classes)} classes: {classes}")
@@ -142,7 +133,3 @@ def main():
 
     make_zip(model_path, directory, ZIP_PATH)
     write_signature(ZIP_PATH, SIGNATURE_PATH)
-
-
-if __name__ == "__main__":
-    main()
