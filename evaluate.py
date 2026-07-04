@@ -6,6 +6,7 @@ import torch
 
 from src.model.dataset import get_n_split
 from src.model.cnn import make_CNN
+from src.utils import error_exit
 
 DEFAULT_ZIP = "leaffliction.zip"
 EXTRACT_DIR = "unzipped"
@@ -16,7 +17,7 @@ IMAGES_NAME = "images"
 def extract_zip(zip_path, extract_dir):
     with zipfile.ZipFile(zip_path, "r") as archive:
         archive.extractall(extract_dir)
-    print(f"Zip extrait dans {extract_dir}/")
+    print(f"Zip extracted to {extract_dir}/")
 
 
 def compute_accuracy(model, loader, device):
@@ -36,8 +37,7 @@ def compute_accuracy(model, loader, device):
 def main():
     zip_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_ZIP
     if not os.path.isfile(zip_path):
-        print(f"Error: '{zip_path}' introuvable", file=sys.stderr)
-        sys.exit(1)
+        error_exit(f"'{zip_path}' is not a valid file")
 
     extract_zip(zip_path, EXTRACT_DIR)
     model_path = os.path.join(EXTRACT_DIR, MODEL_NAME)

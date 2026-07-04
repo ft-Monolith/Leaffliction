@@ -1,17 +1,3 @@
-#!/usr/bin/env python3
-"""Augmentation.py
-
-Apply six data-augmentation techniques to a single leaf image, display
-them next to the original, and save each one in the same directory as
-the source image.
-
-Saved files keep the original name with the augmentation type appended,
-e.g. "image (1).JPG" -> "image (1)_Flip.JPG".
-
-Usage:
-    ./Augmentation.py <image_path>
-"""
-
 import os
 import sys
 
