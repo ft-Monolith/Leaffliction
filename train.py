@@ -10,6 +10,7 @@ import torch.nn as nn
 
 from src.model.dataset import get_n_split
 from src.model.cnn import make_CNN
+from src.utils import error_exit
 
 LEARNING_RATE = 0.001
 EPOCHS = 50
@@ -71,7 +72,7 @@ def make_zip(model_path, data_dir, zip_path):
             for name in files:
                 full = os.path.join(root, name)
                 archive.write(full, full)
-    print(f"Zip cree : {zip_path}")
+    print(f"Zip created : {zip_path}")
 
 
 def write_signature(zip_path, signature_path):
@@ -82,19 +83,17 @@ def write_signature(zip_path, signature_path):
     digest = sha1.hexdigest()
     with open(signature_path, "w") as handle:
         handle.write(digest + "\n")
-    print(f"Signature sha1 : {digest}")
+    print(f"signature sha1 : {digest}")
     return digest
 
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: ./train.py <directory>", file=sys.stderr)
-        sys.exit(1)
+        error_exit("usage: ./train.py <directory>")
 
     directory = sys.argv[1]
     if not os.path.isdir(directory):
-        print(f"'{directory}' is not a directory", file=sys.stderr)
-        sys.exit(1)
+        error_exit(f"'{directory}' is not a directory")
 
     # charge les images, les trie, les split, les met en tenseurs
     train_loader, val_loader, classes = get_n_split(directory)

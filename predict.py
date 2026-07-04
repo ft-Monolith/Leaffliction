@@ -7,6 +7,7 @@ from PIL import Image
 
 from src.model.dataset import TRANSFORM
 from src.model.cnn import make_CNN
+from src.utils import error_exit
 
 DATA_DIR = "images"
 DEFAULT_MODEL = os.path.join("models", "model.pth")
@@ -21,8 +22,7 @@ def get_classes(directory):
 
 def load_model(model_path, num_classes):
     if not os.path.isfile(model_path):
-        print(f"Error: model '{model_path}' introuvable", file=sys.stderr)
-        sys.exit(1)
+        error_exit(f"model '{model_path}' missing")
     model = make_CNN(num_classes)
     model.load_state_dict(torch.load(model_path, map_location="cpu"))
     model.eval()
@@ -55,17 +55,14 @@ def show(original, transformed, predicted):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: ./predict.py <image> [model.pth]", file=sys.stderr)
-        sys.exit(1)
+        error_exit("usage: ./predict.py <image> [model.pth]")
 
     image_path = sys.argv[1]
     model_path = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_MODEL
 
     if not os.path.isfile(image_path) or \
             not image_path.lower().endswith(IMAGE_EXTENSIONS):
-        print(f"Error: '{image_path}' n'est pas une image",
-              file=sys.stderr)
-        sys.exit(1)
+        error_exit(f"'{image_path}' is not a valid image file")
 
     classes = get_classes(DATA_DIR)
     model = load_model(model_path, len(classes))
