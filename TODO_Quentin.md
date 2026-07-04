@@ -24,3 +24,10 @@ Quentin:
         deplacer tes fichier dans src
         ensuite ajoute tes fonction et arg dans setup.py
         c'est pour que ce soit plus clean comme ca y a juste setup.py a la racine a lancer pour faire tout ce qu on veut
+
+
+Felix :
+
+    - Ajouter un clean a setup.py
+    - Ajouter un auto mdoe a setup.py 
+    
