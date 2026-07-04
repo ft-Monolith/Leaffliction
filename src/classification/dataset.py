@@ -6,6 +6,8 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
+from src.utils import error_exit
+
 IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
 IMG_SIZE = 128
 BATCH_SIZE = 32
@@ -32,6 +34,8 @@ class LeafDataset(Dataset):
 
 
 def _list_samples(directory):
+    if not os.path.isdir(directory):
+        error_exit(f"'{directory}' is not a directory")
     classes = sorted(
         entry.name for entry in os.scandir(directory) if entry.is_dir()
     )
@@ -47,7 +51,7 @@ def _list_samples(directory):
 def get_n_split(directory, val_ratio=0.2, min_val=100, seed=42):
     classes, samples = _list_samples(directory)
     if not samples:
-        raise ValueError(f"no image found in '{directory}'")
+        error_exit(f"no image found in '{directory}'")
 
     random.Random(seed).shuffle(samples)
     n_val = max(min_val, int(len(samples) * val_ratio))
