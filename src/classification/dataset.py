@@ -6,9 +6,8 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
-from src.utils import error_exit
+from src.utils import error_exit, list_classes, IMAGE_EXTENSIONS
 
-IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
 IMG_SIZE = 128
 BATCH_SIZE = 32
 
@@ -34,11 +33,7 @@ class LeafDataset(Dataset):
 
 
 def _list_samples(directory):
-    if not os.path.isdir(directory):
-        error_exit(f"'{directory}' is not a directory")
-    classes = sorted(
-        entry.name for entry in os.scandir(directory) if entry.is_dir()
-    )
+    classes = list_classes(directory)
     samples = []
     for index, class_name in enumerate(classes):
         class_dir = os.path.join(directory, class_name)
