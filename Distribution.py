@@ -1,16 +1,3 @@
-#!/usr/bin/env python3
-"""Distribution.py
-
-Analyze the class distribution of an image dataset and display it as
-a pie chart and a bar chart.
-
-Each immediate subdirectory of the given directory is treated as one
-class. The chart title is taken from the directory name.
-
-Usage:
-    ./Distribution.py <directory>
-"""
-
 import os
 import sys
 

@@ -1,9 +1,11 @@
 /images/
 /leaves.zip
+/leaffliction.zip
+/models/
+/unzipped/
 /CLAUDE.md
 /__pycache__/
 __pycache__/
 *.pyc
 /.venv/
-
-sample_images/
+felix.md sample_images/
