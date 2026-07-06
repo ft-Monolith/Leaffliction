@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-"""Image transformations for the Leaffliction data set (Part 3).
-
-Two modes:
-  - image path : display the 6 transformations + color histogram.
-  - batch (-src DIR -dst DIR [-mask]) : save every transformation of
-    every image of -src into -dst.
-"""
-
 import argparse
 import os
 import sys
