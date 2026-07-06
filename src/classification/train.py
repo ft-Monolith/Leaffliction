@@ -17,9 +17,8 @@ ZIP_PATH = "leaffliction.zip"
 SIGNATURE_PATH = "signature.txt"
 
 
-def evaluate(model, val_loader, criterion, device):
+def evaluate(model, val_loader, device):
     model.eval()
-    val_loss = 0.0
     correct = 0
     total = 0
 
@@ -27,20 +26,16 @@ def evaluate(model, val_loader, criterion, device):
         for inputs, labels in val_loader:
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            val_loss += loss.item() * inputs.size(0)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-    val_loss /= len(val_loader.dataset)
     val_acc = correct / total
-    return val_loss, val_acc
+    return val_acc
 
 
 def train_one_epoch(model, train_loader, criterion, optimizer, device):
     model.train()
-    running_loss = 0.0
     correct = 0
     total = 0
 
@@ -53,14 +48,12 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device):
         loss.backward()
         optimizer.step()
 
-        running_loss += loss.item() * inputs.size(0)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-    epoch_loss = running_loss / len(train_loader.dataset)
     epoch_acc = correct / total
-    return epoch_loss, epoch_acc
+    return epoch_acc
 
 
 def make_zip(model_path, data_dir, zip_path):
@@ -105,16 +98,16 @@ def run(directory):
     epochs_without_improvement = 0
 
     for epoch in range(EPOCHS):
-        train_loss, train_acc = train_one_epoch(
+        train_acc = train_one_epoch(
             model, train_loader, criterion, optimizer, device
         )
-        val_loss, val_acc = evaluate(
-            model, val_loader, criterion, device
+        val_acc = evaluate(
+            model, val_loader, device
         )
         print(
             f"Epoch {epoch + 1}/{EPOCHS} | "
-            f"Train Loss: {train_loss:.4f} Acc: {train_acc:.4f} | "
-            f"Val Loss: {val_loss:.4f} Acc: {val_acc:.4f}"
+            f"Train Acc: {train_acc:.4f} | "
+            f"Val Acc: {val_acc:.4f}"
         )
 
         if val_acc > best_val_acc:
