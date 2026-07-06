@@ -1,9 +1,9 @@
 import argparse
 import os
 
-from src import distribution, augmentation
-from src.classification import train, predict, evaluate
-from src.utils import error_exit
+from srcs import Distribution, Augmentation
+from srcs.classification import train, predict, evaluate
+from srcs.utils import error_exit
 
 DEFAULT_MODEL = os.path.join("models", "model.pth")
 DEFAULT_ZIP = "leaffliction.zip"
@@ -36,9 +36,9 @@ def main():
     args = build_parser().parse_args()
 
     if args.command == "distribution":
-        distribution.run(args.directory)
+        Distribution.run(args.directory)
     elif args.command == "augment":
-        augmentation.run(args.path)
+        Augmentation.run(args.path)
     elif args.command == "train":
         if not os.path.isdir(args.directory):
             error_exit(f"'{args.directory}' is not a directory")

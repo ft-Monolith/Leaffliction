@@ -7,8 +7,8 @@ import zipfile
 import torch
 import torch.nn as nn
 
-from src.classification.dataset import get_n_split
-from src.classification.cnn import make_CNN, get_device
+from srcs.classification.dataset import get_n_split
+from srcs.classification.cnn import make_CNN, get_device
 
 LEARNING_RATE = 0.001
 EPOCHS = 50

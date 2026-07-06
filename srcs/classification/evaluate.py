@@ -5,9 +5,9 @@ import zipfile
 
 import torch
 
-from src.classification.dataset import get_n_split
-from src.classification.cnn import get_device, load_model
-from src.utils import error_exit
+from srcs.classification.dataset import get_n_split
+from srcs.classification.cnn import get_device, load_model
+from srcs.utils import error_exit
 
 EXTRACT_DIR = "unzipped"
 MODEL_NAME = "model.pth"

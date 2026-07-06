@@ -1,10 +1,15 @@
+#!/usr/bin/env python3
 """Dataset distribution charts (Part 1)."""
 
 import os
+import sys
 
 import matplotlib.pyplot as plt
 
-from src.utils import error_exit, list_images
+try:
+    from srcs.utils import error_exit, list_images
+except ModuleNotFoundError:
+    from utils import error_exit, list_images
 
 
 def count_images_per_class(directory):
@@ -52,3 +57,14 @@ def run(directory):
 
     title = os.path.basename(os.path.normpath(directory))
     plot_distribution(title, counts)
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: ./Distribution.py <directory>", file=sys.stderr)
+        sys.exit(1)
+    run(sys.argv[1])
+
+
+if __name__ == "__main__":
+    main()

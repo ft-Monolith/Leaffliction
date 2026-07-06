@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import torch
 from PIL import Image
 
-from src.classification.dataset import TRANSFORM
-from src.classification.cnn import load_model
-from src.utils import error_exit, list_classes, IMAGE_EXTENSIONS
+from srcs.classification.dataset import TRANSFORM
+from srcs.classification.cnn import load_model
+from srcs.utils import error_exit, list_classes, IMAGE_EXTENSIONS
 
 DATA_DIR = "images"
 

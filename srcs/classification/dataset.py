@@ -6,7 +6,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
-from src.utils import error_exit, list_classes, IMAGE_EXTENSIONS
+from srcs.utils import error_exit, list_classes, IMAGE_EXTENSIONS
 
 IMG_SIZE = 128
 BATCH_SIZE = 32
