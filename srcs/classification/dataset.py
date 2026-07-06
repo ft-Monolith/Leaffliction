@@ -1,4 +1,3 @@
-
 import os
 import random
 
@@ -32,19 +31,26 @@ class LeafDataset(Dataset):
         return self.transform(image), label
 
 
-def _list_samples(directory):
+def list_image_files(class_dir):
+    paths = []
+    for name in sorted(os.listdir(class_dir)):
+        if name.lower().endswith(IMAGE_EXTENSIONS):
+            paths.append(os.path.join(class_dir, name))
+    return paths
+
+
+def list_samples(directory):
     classes = list_classes(directory)
     samples = []
-    for index, class_name in enumerate(classes):
+    for label, class_name in enumerate(classes):
         class_dir = os.path.join(directory, class_name)
-        for name in sorted(os.listdir(class_dir)):
-            if name.lower().endswith(IMAGE_EXTENSIONS):
-                samples.append((os.path.join(class_dir, name), index))
+        for image_path in list_image_files(class_dir):
+            samples.append((image_path, label))
     return classes, samples
 
 
 def get_n_split(directory, val_ratio=0.2, min_val=100, seed=42):
-    classes, samples = _list_samples(directory)
+    classes, samples = list_samples(directory)
     if not samples:
         error_exit(f"no image found in '{directory}'")
 
