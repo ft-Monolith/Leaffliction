@@ -1,5 +1,3 @@
-"""Évaluation du modèle sur le set de validation (Partie 4)."""
-
 import os
 import zipfile
 

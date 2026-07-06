@@ -27,10 +27,7 @@ def list_classes(directory):
 
 
 def list_images(directory):
-    """Return the list of image file paths directly inside a directory.
-
-    Returns an empty list if the directory cannot be read.
-    """
+    """Return the list of image file paths directly inside a directory."""
     images = []
     try:
         names = os.listdir(directory)
