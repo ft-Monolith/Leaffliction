@@ -1,5 +1,3 @@
-"""Entraînement du CNN + création du zip et de la signature (Partie 4)."""
-
 import hashlib
 import os
 import zipfile
@@ -12,7 +10,7 @@ from srcs.classification.cnn import make_CNN, get_device
 
 LEARNING_RATE = 0.001
 EPOCHS = 50
-PATIENCE = 3  # nb d'epochs sans amelioration avant d'arreter
+PATIENCE = 3  # how many epochs without improvement to stop training
 ZIP_PATH = "leaffliction.zip"
 SIGNATURE_PATH = "signature.txt"
 
@@ -39,14 +37,14 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device):
     correct = 0
     total = 0
 
-    for inputs, labels in train_loader:
-        inputs, labels = inputs.to(device), labels.to(device)
+    for inputs, labels in train_loader: # Iterate over batches of data
+        inputs, labels = inputs.to(device), labels.to(device) #Adapt tensors to device (CPU or GPU)
 
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
+        optimizer.zero_grad() # Reset gradients to zero before backpropagation
+        outputs = model(inputs) # Forward pass: compute model predictions 
+        loss = criterion(outputs, labels) # Compute the loss between predictions and true labels
+        loss.backward() # Backward pass: compute gradients of the loss with respect to model parameters
+        optimizer.step() # Update model parameters based on computed gradients
 
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
@@ -79,7 +77,6 @@ def write_signature(zip_path, signature_path):
 
 
 def run(directory):
-    # charge les images, les trie, les split, les met en tenseurs
     train_loader, val_loader, classes = get_n_split(directory)
     print(f"Found {len(classes)} classes: {classes}")
     print(f"Train: {len(train_loader.dataset)} | "
@@ -87,9 +84,8 @@ def run(directory):
 
     device = get_device()
     model = make_CNN(len(classes)).to(device)
-    criterion = nn.CrossEntropyLoss()  # calcul de la loss
-    # Adam : met à jour les poids du modèle
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    criterion = nn.CrossEntropyLoss()  # Loss function
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE) # Optimizer for updating model parameters
 
     model_path = os.path.join("models", "model.pth")
     os.makedirs("models", exist_ok=True)
