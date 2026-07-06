@@ -1,6 +1,7 @@
 import argparse
 import os
 
+from src import distribution, augmentation
 from src.classification import train, predict, evaluate
 from src.utils import error_exit
 
@@ -11,6 +12,12 @@ DEFAULT_ZIP = "leaffliction.zip"
 def build_parser():
     parser = argparse.ArgumentParser(prog="Leaffliction")
     sub = parser.add_subparsers(dest="command", required=True)
+
+    p_dist = sub.add_parser("distribution", help="plot class distribution")
+    p_dist.add_argument("directory", help="dataset path")
+
+    p_aug = sub.add_parser("augment", help="augment an image or balance a set")
+    p_aug.add_argument("path", help="image file or dataset directory")
 
     p_train = sub.add_parser("train", help="train the model")
     p_train.add_argument("directory", help="dataset path")
@@ -28,7 +35,11 @@ def build_parser():
 def main():
     args = build_parser().parse_args()
 
-    if args.command == "train":
+    if args.command == "distribution":
+        distribution.run(args.directory)
+    elif args.command == "augment":
+        augmentation.run(args.path)
+    elif args.command == "train":
         if not os.path.isdir(args.directory):
             error_exit(f"'{args.directory}' is not a directory")
         train.run(args.directory)
