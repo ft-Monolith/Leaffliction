@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Data augmentation for the Leaffliction data set (Part 2).
 
 Two modes:
@@ -14,7 +15,10 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.utils import error_exit, is_image, list_classes, list_images
+try:
+    from srcs.utils import error_exit, is_image, list_classes, list_images
+except ModuleNotFoundError:
+    from utils import error_exit, is_image, list_classes, list_images
 
 BORDER = cv2.BORDER_REFLECT
 
@@ -198,3 +202,15 @@ def run(path):
     if results is None:
         error_exit(f"cannot read image '{path}'")
     display(results)
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: ./Augmentation.py <image_path | directory>",
+              file=sys.stderr)
+        sys.exit(1)
+    run(sys.argv[1])
+
+
+if __name__ == "__main__":
+    main()

@@ -3,7 +3,7 @@ import os
 import torch
 import torch.nn as nn
 
-from src.utils import error_exit
+from srcs.utils import error_exit
 
 
 def make_CNN(num_classes):
