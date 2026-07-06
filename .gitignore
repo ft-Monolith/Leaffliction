@@ -8,4 +8,5 @@
 __pycache__/
 *.pyc
 /.venv/
-felix.md sample_images/
+felix.md
+sample_images/
