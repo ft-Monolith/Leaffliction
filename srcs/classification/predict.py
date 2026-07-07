@@ -1,5 +1,3 @@
-"""Prédiction de la maladie d'une feuille + affichage (Partie 4)."""
-
 import os
 
 import matplotlib.pyplot as plt
