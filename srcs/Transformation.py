@@ -182,7 +182,7 @@ def display_single(path):
     fig, axes = plt.subplots(2, 3, figsize=(13, 8))
     for ax, (name, img) in zip(axes.ravel(), images.items()):
         _imshow(ax, name, img)
-    fig.tight_layout()
+    fig.tight_layout(pad=2)
 
     fig_hist, ax_hist = plt.subplots(figsize=(9, 5))
     plot_histogram(rgb, mask, ax_hist)
