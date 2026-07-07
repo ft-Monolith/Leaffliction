@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-"""Leaf image transformations with plantCV (Part 3).
-
-Two modes:
-  - image path : display the transformations (figures IV.1 to IV.7).
-  - -src <dir> -dst <dir> [-mask] : save the transformations of every
-    image of src into dst; -mask also saves the binary leaf mask.
-"""
-
 import argparse
 import os
 import sys

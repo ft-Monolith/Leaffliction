@@ -71,3 +71,7 @@ def main():
         mask_dataset.run(args.src, args.dst)
     elif args.command == "zip":
         zip.run(args.model, args.directory)
+
+
+if __name__ == "__main__":
+    main()

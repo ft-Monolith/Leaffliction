@@ -7,7 +7,7 @@ from PIL import Image
 from srcs.classification.dataset import TRANSFORM
 from srcs.classification.cnn import load_model
 from srcs.utils import error_exit, list_classes, IMAGE_EXTENSIONS
-from srcs.Transformation import read_rgb, transformations
+from srcs.Transformation import read_rgb, leaf_mask, t_mask
 
 DATA_DIR = "images"
 
@@ -51,9 +51,9 @@ def run(image_path, model_path):
     rgb = read_rgb(image_path)
     if rgb is None:
         error_exit(f"cannot open image '{image_path}'")
+    masked = t_mask(rgb, leaf_mask(rgb))
 
-    predicted, _ = predict(model, classes, Image.fromarray(rgb))
-    images, _ = transformations(rgb)
+    predicted, _ = predict(model, classes, Image.fromarray(masked))
 
     print(f"Class predicted : {predicted}")
-    show(rgb, images["Mask"], predicted)
+    show(rgb, masked, predicted)
