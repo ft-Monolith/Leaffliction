@@ -9,7 +9,7 @@ from srcs.utils import error_exit
 
 EXTRACT_DIR = "unzipped"
 MODEL_NAME = "model.pth"
-IMAGES_NAME = "images"
+IMAGES_NAME = "augmented_directory"
 
 
 def extract_zip(zip_path, extract_dir):

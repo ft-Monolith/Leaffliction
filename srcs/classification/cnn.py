@@ -5,7 +5,6 @@ import torch.nn as nn
 
 from srcs.utils import error_exit
 
-
 def make_CNN(num_classes):
     model = LeafCNN(num_classes)
     return model
