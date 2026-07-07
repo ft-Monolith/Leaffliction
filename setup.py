@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from srcs import Distribution, Augmentation
+from srcs import Distribution, Augmentation, Transformation
 from srcs.classification import (
     train, predict, evaluate, mask_dataset, zip
 )
@@ -20,6 +20,12 @@ def build_parser():
 
     p_aug = sub.add_parser("augment", help="augment an image or balance a set")
     p_aug.add_argument("path", help="image file or dataset directory")
+
+    p_tr = sub.add_parser("transform", help="transform image(s)")
+    p_tr.add_argument("image", nargs="?", help="single image to display")
+    p_tr.add_argument("-src", help="source directory (batch mode)")
+    p_tr.add_argument("-dst", help="destination directory (batch mode)")
+    p_tr.add_argument("-mask", action="store_true", help="also save the mask")
 
     p_train = sub.add_parser("train", help="train the model")
     p_train.add_argument("directory", help="dataset path")
@@ -49,6 +55,8 @@ def main():
         Distribution.run(args.directory)
     elif args.command == "augment":
         Augmentation.run(args.path)
+    elif args.command == "transform":
+        Transformation.run(args.image, args.src, args.dst, args.mask)
     elif args.command == "train":
         if not os.path.isdir(args.directory):
             error_exit(f"'{args.directory}' is not a directory")
