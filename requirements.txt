@@ -4,5 +4,6 @@ numpy
 opencv-python
 pandas
 Pillow
+plantcv
 torch
 torchvision
