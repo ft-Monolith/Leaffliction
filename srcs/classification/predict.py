@@ -1,5 +1,3 @@
-"""Prédiction de la maladie d'une feuille + affichage (Partie 4)."""
-
 import os
 
 import matplotlib.pyplot as plt
@@ -9,6 +7,7 @@ from PIL import Image
 from srcs.classification.dataset import TRANSFORM
 from srcs.classification.cnn import load_model
 from srcs.utils import error_exit, list_classes, IMAGE_EXTENSIONS
+from srcs.Transformation import read_rgb, transformations
 
 DATA_DIR = "images"
 
@@ -22,15 +21,16 @@ def predict(model, classes, image):
 
 
 def show(original, transformed, predicted):
-    transformed_img = transformed.permute(1, 2, 0).numpy()
-
     fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(10, 6))
     fig.suptitle("=== DL classification ===", fontsize=14)
     ax_left.imshow(original)
     ax_left.set_title("Original")
     ax_left.axis("off")
-    ax_right.imshow(transformed_img)
-    ax_right.set_title("Transformee")
+    if transformed.ndim == 2:
+        ax_right.imshow(transformed, cmap="gray")
+    else:
+        ax_right.imshow(transformed)
+    ax_right.set_title("Transformed")
     ax_right.axis("off")
     fig.text(0.5, 0.04, f"Class predicted : {predicted}",
              ha="center", fontsize=14, color="green")
@@ -48,12 +48,12 @@ def run(image_path, model_path):
 
     model = load_model(model_path, len(classes))
 
-    try:
-        original = Image.open(image_path).convert("RGB")
-    except Exception:
+    rgb = read_rgb(image_path)
+    if rgb is None:
         error_exit(f"cannot open image '{image_path}'")
 
-    predicted, transformed = predict(model, classes, original)
+    predicted, _ = predict(model, classes, Image.fromarray(rgb))
+    images, _ = transformations(rgb)
 
     print(f"Class predicted : {predicted}")
-    show(original, transformed, predicted)
+    show(rgb, images["Mask"], predicted)
