@@ -23,11 +23,11 @@ def write_signature(zip_path, signature_path):
     with open(zip_path, "rb") as handle:
         for chunk in iter(lambda: handle.read(8192), b""):
             sha1.update(chunk)
-    digest = sha1.hexdigest()
+    key = sha1.hexdigest()
     with open(signature_path, "w") as handle:
-        handle.write(digest + "\n")
-    print(f"signature sha1 : {digest}")
-    return digest
+        handle.write(key + "\n")
+    print(f"signature sha1 : {key}")
+    return key
 
 
 def run(model_path, data_dir):
