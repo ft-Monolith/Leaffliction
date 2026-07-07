@@ -116,7 +116,7 @@ def display(results):
         ax.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         ax.set_title(name)
         ax.axis("off")
-    plt.tight_layout()
+    plt.tight_layout(pad=2)
     plt.show()
 
 
