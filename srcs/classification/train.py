@@ -62,7 +62,7 @@ def prepare_dataset(base_dir):
     print(f"Building '{AUGMENTED_DIR}' from '{base_dir}'...")
     shutil.copytree(base_dir, AUGMENTED_DIR)
     Augmentation.balance_directory(AUGMENTED_DIR)
-    mask_dataset.run(AUGMENTED_DIR, AUGMENTED_DIR)
+    # mask_dataset.run(AUGMENTED_DIR, AUGMENTED_DIR)
     return AUGMENTED_DIR
 
 
