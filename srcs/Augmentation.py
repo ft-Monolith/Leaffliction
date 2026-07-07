@@ -116,54 +116,41 @@ def display(results):
         ax.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         ax.set_title(name)
         ax.axis("off")
-    plt.tight_layout()
+    plt.tight_layout(pad=2)
     plt.show()
-
-
-def build_tasks(sources):
-    """Return (path, name, func) tasks interleaving augmentation types.
-
-    The type is rotated per image so that even a partial pass (when only
-    a few extra images are needed) covers all augmentation types instead
-    of, for example, only flips. Each (image, type) pair appears once.
-    """
-    types = list(AUGMENTATIONS.items())
-    count = len(types)
-    tasks = []
-    for offset in range(count):
-        for index, path in enumerate(sources):
-            name, func = types[(index + offset) % count]
-            tasks.append((path, name, func))
-    return tasks
 
 
 def balance_class(class_dir, target):
     """Generate augmented images until the class reaches `target`.
 
+    Pass 1 gives image i the augmentation type i % 6, pass 2 the type
+    (i + 1) % 6, and so on: even a partial pass covers all 6 types.
     Only original (non-augmented) images are used as sources, and files
     that already exist on disk are never overwritten. Returns the number
     of images created.
     """
     images = list_images(class_dir)
-    current = len(images)
-    need = target - current
+    need = target - len(images)
     if need <= 0:
         return 0
 
     sources = [p for p in images if not is_augmented(p)]
+    types = list(AUGMENTATIONS.items())
     created = 0
-    for path, name, _ in build_tasks(sources):
-        if created >= need:
-            break
-        base, ext = os.path.splitext(path)
-        out = f"{base}_{name}{ext}"
-        if os.path.exists(out):
-            continue
-        img = cv2.imread(path)
-        if img is None:
-            continue
-        cv2.imwrite(out, AUGMENTATIONS[name](img))
-        created += 1
+    for offset in range(len(types)):
+        for index, path in enumerate(sources):
+            if created == need:
+                return created
+            name, func = types[(index + offset) % len(types)]
+            base, ext = os.path.splitext(path)
+            out = f"{base}_{name}{ext}"
+            if os.path.exists(out):
+                continue
+            img = cv2.imread(path)
+            if img is None:
+                continue
+            cv2.imwrite(out, func(img))
+            created += 1
 
     if created < need:
         print(f"  warning: only {created}/{need} images could be created "
