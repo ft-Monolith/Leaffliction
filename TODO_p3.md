@@ -14,8 +14,10 @@ planches de contrôle (1 image par classe, 8 classes) — voir section 1/2.
 - [x] **Mask (IV.3)** — DÉCISION : on garde propre (feuille isolée pleine en
       couleur). Correspond à la figure IV.3 du sujet (feuille isolée). Validé
       sur les 8 classes, segmentation solide partout.
-- [x] **Roi objects (IV.4)** — vert = (feuille) ∩ (tissu sain), taches
-      visibles + cadre bleu. OK.
+- [x] **Roi objects (IV.4)** — SIMPLIFIÉ (audit 2026-07-07) : vert =
+      feuille entière (masque gardé par pcv.roi.filter) + cadre bleu.
+      Le 2e seuil saturation "tissu sain" a été retiré (dur à justifier
+      en défense, purement esthétique). Matche la figure IV.4.
 - [x] **Analyze object (IV.5)** — contour rouge + lignes de forme magenta,
       suit bien la feuille sur les 8 classes. Acceptable.
 - [x] **Pseudolandmarks (IV.6)** — points bien placés (contour + nervure
@@ -37,6 +39,9 @@ planches de contrôle (1 image par classe, 8 classes) — voir section 1/2.
       les 2 fenêtres (grille 2x3 + histogramme), lisibilité, titres.
 
 ## 4. Divers
+
+- [x] Shebang `#!/usr/bin/env python3` + docstring module ajoutés (audit
+      2026-07-07) — `./Transformation.py -h` refonctionne depuis srcs/.
 
 - [x] Comportement de `-mask` : sauve en plus le masque binaire
       `_Leaf_mask.JPG`. Sémantique conservée. OK.
