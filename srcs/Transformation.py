@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+"""Leaf image transformations with plantCV (Part 3).
+
+Two modes:
+  - image path : display the transformations (figures IV.1 to IV.7).
+  - -src <dir> -dst <dir> [-mask] : save the transformations of every
+    image of src into dst; -mask also saves the binary leaf mask.
+"""
+
 import argparse
 import os
 import sys
@@ -11,8 +20,6 @@ try:
     from srcs.utils import error_exit, is_image, list_images
 except ModuleNotFoundError:
     from utils import error_exit, is_image, list_images
-
-pcv.params.debug = None
 
 # 9 channels of figure IV.7: (label, plot color, colorspace, channel index)
 HIST_CHANNELS = [
@@ -78,19 +85,12 @@ def t_mask(rgb, mask):
 
 
 def t_roi(rgb, mask):
-    """Figure IV.4 - leaf tissue kept inside the ROI.
-
-    Green covers only the healthy tissue inside the leaf, so veins and
-    lesions show through instead of being hidden by a solid fill.
-    """
+    """Figure IV.4 - leaf pixels kept inside the ROI, painted green."""
     height, width = mask.shape[:2]
     roi = pcv.roi.rectangle(img=rgb, x=0, y=0, h=height, w=width)
     kept = pcv.roi.filter(mask=mask, roi=roi, roi_type="partial")
-    sat = pcv.rgb2gray_hsv(rgb_img=rgb, channel="s")
-    tissue = pcv.threshold.otsu(gray_img=sat, object_type="light")
-    green = (kept != 0) & (tissue != 0)
     out = rgb.copy()
-    out[green] = (0, 255, 0)
+    out[kept != 0] = (0, 255, 0)
     cv2.rectangle(out, (0, 0), (width - 1, height - 1), (0, 0, 255), 5)
     return out
 

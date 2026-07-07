@@ -34,9 +34,9 @@ def plot_distribution(title, counts):
     fig, (ax_pie, ax_bar) = plt.subplots(1, 2, figsize=(14, 6))
     fig.suptitle(f"{title} class distribution")
 
-    ax_pie.pie(values, labels=labels, autopct="%1.1f%%")
+    wedges = ax_pie.pie(values, labels=labels, autopct="%1.1f%%")[0]
 
-    ax_bar.bar(labels, values)
+    ax_bar.bar(labels, values, color=[w.get_facecolor() for w in wedges])
     ax_bar.set_ylabel("Number of images")
     ax_bar.tick_params(axis="x", rotation=45)
 
