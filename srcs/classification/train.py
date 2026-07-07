@@ -1,18 +1,18 @@
-import hashlib
 import os
-import zipfile
+import shutil
 
 import torch
 import torch.nn as nn
 
+from srcs import Augmentation
+from srcs.classification import mask_dataset, zip
 from srcs.classification.dataset import get_n_split
 from srcs.classification.cnn import make_CNN, get_device
 
 LEARNING_RATE = 0.001
 EPOCHS = 50
 PATIENCE = 3  # how many epochs without improvement to stop training
-ZIP_PATH = "leaffliction.zip"
-SIGNATURE_PATH = "signature.txt"
+AUGMENTED_DIR = "augmented_directory"
 
 
 def evaluate(model, val_loader, device):
@@ -37,14 +37,15 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device):
     correct = 0
     total = 0
 
-    for inputs, labels in train_loader: # Iterate over batches of data
-        inputs, labels = inputs.to(device), labels.to(device) #Adapt tensors to device (CPU or GPU)
+    for inputs, labels in train_loader:
+        # tensor to device (GPU or CPU)
+        inputs, labels = inputs.to(device), labels.to(device)
 
-        optimizer.zero_grad() # Reset gradients to zero before backpropagation
-        outputs = model(inputs) # Forward pass: compute model predictions 
-        loss = criterion(outputs, labels) # Compute the loss between predictions and true labels
-        loss.backward() # Backward pass: compute gradients of the loss with respect to model parameters
-        optimizer.step() # Update model parameters based on computed gradients
+        optimizer.zero_grad()  # reset gradients
+        outputs = model(inputs)  # forward : model prediction
+        loss = criterion(outputs, labels)  # compute loss
+        loss.backward()  # backward : compute gradients
+        optimizer.step()  # update weights
 
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
@@ -54,38 +55,30 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device):
     return epoch_acc
 
 
-def make_zip(model_path, data_dir, zip_path):
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
-        archive.write(model_path, os.path.basename(model_path))
-        for root, _, files in os.walk(data_dir):
-            for name in files:
-                full = os.path.join(root, name)
-                archive.write(full, full)
-    print(f"Zip created : {zip_path}")
-
-
-def write_signature(zip_path, signature_path):
-    sha1 = hashlib.sha1()
-    with open(zip_path, "rb") as handle:
-        for chunk in iter(lambda: handle.read(8192), b""):
-            sha1.update(chunk)
-    digest = sha1.hexdigest()
-    with open(signature_path, "w") as handle:
-        handle.write(digest + "\n")
-    print(f"signature sha1 : {digest}")
-    return digest
+def prepare_dataset(base_dir):
+    if os.path.isdir(AUGMENTED_DIR):
+        print(f"'{AUGMENTED_DIR}' already exists, reusing it")
+        return AUGMENTED_DIR
+    print(f"Building '{AUGMENTED_DIR}' from '{base_dir}'...")
+    shutil.copytree(base_dir, AUGMENTED_DIR)
+    Augmentation.balance_directory(AUGMENTED_DIR)
+    mask_dataset.run(AUGMENTED_DIR, AUGMENTED_DIR)
+    return AUGMENTED_DIR
 
 
 def run(directory):
+    directory = prepare_dataset(directory)
     train_loader, val_loader, classes = get_n_split(directory)
     print(f"Found {len(classes)} classes: {classes}")
     print(f"Train: {len(train_loader.dataset)} | "
           f"Val: {len(val_loader.dataset)}")
 
     device = get_device()
+    print(f"Using device: {device}")
     model = make_CNN(len(classes)).to(device)
-    criterion = nn.CrossEntropyLoss()  # Loss function
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE) # Optimizer for updating model parameters
+    criterion = nn.CrossEntropyLoss()  # loss function
+    # Adam : optimizer that adapts the learning rate for each parameter
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     model_path = os.path.join("models", "model.pth")
     os.makedirs("models", exist_ok=True)
@@ -120,5 +113,4 @@ def run(directory):
     print(f"best val accuracy: {best_val_acc:.4f}")
     print(f"Model saved in {model_path}")
 
-    make_zip(model_path, directory, ZIP_PATH)
-    write_signature(ZIP_PATH, SIGNATURE_PATH)
+    zip.run(model_path, directory)

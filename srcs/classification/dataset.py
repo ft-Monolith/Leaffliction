@@ -7,7 +7,7 @@ from torchvision import transforms
 
 from srcs.utils import error_exit, list_classes, IMAGE_EXTENSIONS
 
-IMG_SIZE = 128
+IMG_SIZE = 64
 BATCH_SIZE = 32
 
 TRANSFORM = transforms.Compose([

@@ -12,7 +12,11 @@ def make_CNN(num_classes):
 
 
 def get_device():
-    return "cuda" if torch.cuda.is_available() else "cpu"
+    if torch.cuda.is_available():
+        return "cuda"
+    if torch.backends.mps.is_available():  # GPU Apple
+        return "mps"
+    return "cpu"
 
 
 def load_model(model_path, num_classes, device="cpu"):
@@ -32,14 +36,18 @@ def load_model(model_path, num_classes, device="cpu"):
 class LeafCNN(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
-        # Define the CNN architecture 
+        # CNN : Convolutional Neural Network 
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1)  # 3->64
         self.conv2 = nn.Conv2d(64, 128, kernel_size=3, padding=1)  # ->128
         self.conv3 = nn.Conv2d(128, 256, kernel_size=3, padding=1)  # ->256
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2) # Pooling layer to reduce spatial dimensions
-        self.relu = nn.ReLU() # Non-linear activation function (negative values to zero)
-        self.gap = nn.AdaptiveAvgPool2d(1) # Global Average Pooling layer to reduce each feature map to a single value
-        self.fc = nn.Linear(256, num_classes) # Fully connected layer to map the 256 features to the number of classes
+        # MaxPool : reduces the size of the feature maps
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        # ReLU : applies the ReLU activation function (puts negative values to zero)
+        self.relu = nn.ReLU()
+        # GAP : reduces each feature map to a single value
+        self.gap = nn.AdaptiveAvgPool2d(1)
+        # Linear : fully connected layer that maps the 256 features to the number of classes
+        self.fc = nn.Linear(256, num_classes)
 
     def forward(self, x):
         x = self.conv1(x)
