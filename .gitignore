@@ -5,9 +5,16 @@
 /unzipped/
 /augmented_directory/
 /test/
+/leaffliction.zip
+/models/
+/unzipped/
+/augmented_directory/
+/test/
 /CLAUDE.md
 /__pycache__/
 __pycache__/
 *.pyc
 /.venv/
+felix.md
+sample_images/
 felix.md sample_images/
