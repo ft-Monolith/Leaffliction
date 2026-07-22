@@ -121,13 +121,13 @@ def display(results):
 
 
 def balance_class(class_dir, target):
-    """Generate augmented images until the class reaches `target`.
+    """Create augmented images until the class holds `target` files.
 
-    Pass 1 gives image i the augmentation type i % 6, pass 2 the type
-    (i + 1) % 6, and so on: even a partial pass covers all 6 types.
-    Only original (non-augmented) images are used as sources, and files
-    that already exist on disk are never overwritten. Returns the number
-    of images created.
+    Only original (non-augmented) images are used as sources. Each pass
+    gives every source one augmentation; the offset shifts the chosen
+    type each pass so a source never gets the same type twice (hence no
+    duplicate file names). Stops as soon as `target` is reached, skips
+    files already on disk, and returns the number of images created.
     """
     images = list_images(class_dir)
     need = target - len(images)

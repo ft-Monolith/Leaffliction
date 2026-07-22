@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+"""Image transformations for the Leaffliction data set (Part 3).
+
+Two modes:
+  - image path : display the 6 plantCV transformations and the color
+    histogram with matplotlib.
+  - -src <dir> -dst <dir> [-mask] : save every transformation of every
+    image of the source directory into the destination directory.
+"""
+
 import argparse
 import os
 import sys
@@ -13,6 +23,9 @@ except ModuleNotFoundError:
     from utils import error_exit, is_image, list_images
 
 # 9 channels of figure IV.7: (label, plot color, colorspace, channel index)
+# RGB: Rouge(0), Vert(1), Bleu(2)
+# HSV: Teinte(0), Saturation(1), Valeur(2)
+# LAB: Lightness(0), a=vert-magenta(1), b=bleu-jaune(2)
 HIST_CHANNELS = [
     ("blue", "blue", "rgb", 2),
     ("blue-yellow", "gold", "lab", 2),
@@ -34,60 +47,63 @@ def read_rgb(path):
     return cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
 
 
-def leaf_threshold(rgb):
-    """Return the raw binary threshold of the leaf (keeps internal texture).
+def raw_leaf_mask(rgb):
+    """Build a rough black/white leaf mask (before cleaning).
 
-    The LAB 'a' (green-magenta) channel separates the green/brown leaf
-    from the neutral PlantVillage background far more reliably than
-    saturation.
+    Uses the LAB 'a' channel, which tells the green/brown leaf apart
+    from the neutral background better than any other channel.
     """
     chan_a = pcv.rgb2gray_lab(rgb_img=rgb, channel="a")
     return pcv.threshold.otsu(gray_img=chan_a, object_type="dark")
 
 
 def clean_mask(raw):
-    """Fill noise and holes to get a solid leaf silhouette."""
-    mask = pcv.fill(bin_img=raw, size=200)
-    mask = pcv.fill_holes(bin_img=mask)
-    return mask
+    """Drop small noise blobs but keep disease spots as holes."""
+    return pcv.fill(bin_img=raw, size=200)
 
 
 def leaf_mask(rgb):
     """Return the cleaned binary mask isolating the leaf."""
-    return clean_mask(leaf_threshold(rgb))
+    return clean_mask(raw_leaf_mask(rgb))
 
 
 def t_blur(rgb):
-    """Figure IV.2 - gaussian blur applied to the leaf threshold.
+    """Figure 2 - gaussian blur of the raw leaf mask.
 
-    Blurring the reliable LAB 'a' threshold smooths noise before the
-    mask is built, matching the plantCV workflow. Using the same channel
-    as the mask keeps the result consistent across every class (the
-    saturation channel failed on low-saturation leaves like
-    Apple_healthy).
+    Blurring the raw mask smooths its edges while
+    keeping the dark disease spots visible as holes.
     """
-    raw = leaf_threshold(rgb)
+    raw = raw_leaf_mask(rgb)
     return pcv.gaussian_blur(img=raw, ksize=(5, 5))
 
 
 def t_mask(rgb, mask):
-    """Figure IV.3 - leaf isolated on a white background."""
+    """Figure 3 - leaf isolated on a white background."""
     return pcv.apply_mask(img=rgb, mask=mask, mask_color="white")
 
 
 def t_roi(rgb, mask):
-    """Figure IV.4 - leaf pixels kept inside the ROI, painted green."""
+    """Figure 4 - leaf pixels kept inside the ROI, painted green."""
     height, width = mask.shape[:2]
-    roi = pcv.roi.rectangle(img=rgb, x=0, y=0, h=height, w=width)
+    ys, xs = np.where(mask > 0)
+    if len(xs) == 0:
+        x0, y0, x1, y1 = 0, 0, width - 1, height - 1
+    else:
+        pad = 5
+        x0 = max(int(xs.min()) - pad, 0)
+        y0 = max(int(ys.min()) - pad, 0)
+        x1 = min(int(xs.max()) + pad, width - 1)
+        y1 = min(int(ys.max()) + pad, height - 1)
+    roi = pcv.roi.rectangle(img=rgb, x=x0, y=y0, h=y1 - y0, w=x1 - x0)
     kept = pcv.roi.filter(mask=mask, roi=roi, roi_type="partial")
     out = rgb.copy()
     out[kept != 0] = (0, 255, 0)
-    cv2.rectangle(out, (0, 0), (width - 1, height - 1), (0, 0, 255), 5)
+    cv2.rectangle(out, (x0, y0), (x1, y1), (0, 0, 255), 5)
     return out
 
 
 def t_analyze(rgb, mask):
-    """Figure IV.5 - shape analysis of the leaf object."""
+    """Figure 5 - shape analysis of the leaf object."""
     return pcv.analyze.size(img=rgb, labeled_mask=mask, n_labels=1, label="")
 
 
@@ -103,7 +119,7 @@ def _draw_points(image, points, color):
 
 
 def t_pseudolandmarks(rgb, mask):
-    """Figure IV.6 - top/bottom/left/right pseudolandmark points."""
+    """Figure 6 - top/bottom/left/right pseudolandmark points."""
     out = rgb.copy()
     top, bottom, center_v = pcv.homology.x_axis_pseudolandmarks(
         img=rgb, mask=mask)
@@ -141,7 +157,7 @@ def _channel(rgb, colorspace, index):
 
 
 def plot_histogram(rgb, mask, ax):
-    """Figure IV.7 - proportion of pixels per intensity, 9 channels."""
+    """Figure 7 - proportion of pixels per intensity, 9 channels."""
     total = max(int(np.count_nonzero(mask)), 1)
     for label, color, colorspace, index in HIST_CHANNELS:
         channel = _channel(rgb, colorspace, index)
