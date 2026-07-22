@@ -22,6 +22,9 @@ try:
 except ModuleNotFoundError:
     from utils import error_exit, is_image, list_images
 
+# Silence plantCV and stop analyze.size from drawing the object id
+pcv.params.verbose = False
+
 # 9 channels of figure IV.7: (label, plot color, colorspace, channel index)
 # RGB: Rouge(0), Vert(1), Bleu(2)
 # HSV: Teinte(0), Saturation(1), Valeur(2)
@@ -104,7 +107,9 @@ def t_roi(rgb, mask):
 
 def t_analyze(rgb, mask):
     """Figure 5 - shape analysis of the leaf object."""
-    return pcv.analyze.size(img=rgb, labeled_mask=mask, n_labels=1, label="")
+    labeled, n = pcv.create_labels(mask=mask)
+    return pcv.analyze.size(
+        img=rgb, labeled_mask=labeled, n_labels=n, label="")
 
 
 def _draw_points(image, points, color):
