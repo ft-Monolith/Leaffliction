@@ -7,7 +7,7 @@ from srcs.classification import (
 )
 from srcs.utils import error_exit
 
-DEFAULT_MODEL = os.path.join("models", "model.pth")
+DEFAULT_MODEL = os.path.join("unzipped", "model.pth")
 DEFAULT_ZIP = "directory.zip"
 
 
