@@ -8,7 +8,7 @@ from srcs.classification import (
 from srcs.utils import error_exit
 
 DEFAULT_MODEL = os.path.join("models", "model.pth")
-DEFAULT_ZIP = "leaffliction.zip"
+DEFAULT_ZIP = "directory.zip"
 
 
 def build_parser():

@@ -4,7 +4,7 @@ import zipfile
 
 from srcs.utils import error_exit
 
-ZIP_PATH = "leaffliction.zip"
+ZIP_PATH = "directory.zip"
 SIGNATURE_PATH = "signature.txt"
 
 
