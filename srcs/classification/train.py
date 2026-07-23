@@ -11,7 +11,7 @@ from srcs.classification.cnn import make_CNN, get_device
 
 LEARNING_RATE = 0.001
 EPOCHS = 50
-PATIENCE = 3  # how many epochs without improvement to stop training
+PATIENCE = 5  # how many epochs without improvement to stop training
 AUGMENTED_DIR = "augmented_directory"
 
 
